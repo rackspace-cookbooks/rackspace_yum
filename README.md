@@ -1,21 +1,20 @@
 yum Cookbook
 ============
 
-The Yum cookbook exposes the `yum_globalconfig` and `yum_repository`
-resources that allows a user to both control global behavior and make
-individual Yum repositories available for use. These resources aim to
-allow the user to configure all options listed in the `yum.conf` man
-page, found at http://linux.die.net/man/5/yum.conf
+The Yum cookbook exposes the `rackspace_yum_globalconfig` and
+`rackspace_yum_repository` resources that allows a user to both control global
+behavior and make individual Yum repositories available for use. These
+resources aim to allow the user to configure all options listed in the
+`yum.conf` man page, found at http://linux.die.net/man/5/yum.conf
 
 NOTES
 -----
 WARNING: Yum cookbook version 3.0.0 and above contain non-backwards
 compatible breaking changes and will not work with cookbooks written
 against the 2.x and 1.x series. Changes have been made to the
-yum_repository resource, and the yum_key resource has been eliminated
-entirely. Recipes have been eliminated and moved into their own
-cookbooks. Please lock yum to the 2.x series in your Chef environments
-until all dependent cookbooks have been ported.
+rackspace_yum_repository resource. Recipes have been eliminated and moved into
+their own cookbooks. Please lock yum to the 2.x series in your Chef
+environments until all dependent cookbooks have been ported.
 
 Requirements
 ------------
@@ -25,12 +24,69 @@ Requirements
 
 Resources/Providers
 -------------------
+### rackspace_yum_key
+This LWRP handles importing GPG keys for YUM repositories. Keys can be
+imported by the `url` parameter or placed in `/etc/pki/rpm-gpg/` by a
+recipe and then installed with the LWRP without passing the URL.
 
-### yum_repository
+#### Actions
+- :add: installs the GPG key into `/etc/pki/rpm-gpg/`
+- :remove: removes the GPG key from `/etc/pki/rpm-gpg/`
+
+#### Attribute Parameters
+- key: name attribute. The name of the GPG key to install.
+- url: if the key needs to be downloaded, the URL providing the download.
+
+#### Example
+
+``` ruby
+# add the Zenoss GPG key
+rackspace_yum_key "RPM-GPG-KEY-zenoss" do
+  url "http://dev.zenoss.com/yum/RPM-GPG-KEY-zenoss"
+  action :add
+end
+
+# remove Zenoss GPG key
+rackspace_yum_key "RPM-GPG-KEY-zenoss" do
+  action :remove
+end
+```
+
+### rackspace_yum_repository
 This resource manages a yum repository configuration file at
 /etc/yum.repos.d/`repositoryid`.repo. When the file needs to be
 repaired, it calls yum-makecache so packages in the repo become
 available to the next resource.
+
+#### Attribute Parameters
+- key: name attribute. The name of the GPG key to install.
+- url: if the key needs to be downloaded, the URL providing the download.
+
+#### Example
+``` ruby
+# add the Zenoss repository
+rackspace_yum_repository 'zenoss' do
+  description "Zenoss Stable repo"
+  baseurl "http://dev.zenoss.com/yum/stable/"
+  gpgkey 'http://dev.zenoss.com/yum/RPM-GPG-KEY-zenoss'
+  action :create
+end
+
+# add the EPEL repo
+rackspace_yum_repository 'epel' do
+  description 'Extra Packages for Enterprise Linux'
+  mirrorlist 'http://mirrors.fedoraproject.org/mirrorlist?repo=epel-6&arch=$basearch'
+  gpgkey 'http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6'
+  action :create
+end
+```
+
+``` ruby
+# delete CentOS-Media repo
+rackspace_yum_repository 'CentOS-Media' do
+  action :delete
+end
+```
 
 #### Actions
 - `:create` - creates a repository file and builds the repository listing
@@ -62,8 +118,8 @@ available to the next resource.
 * `gpgkey` - A URL pointing to the ASCII-armored GPG key file for the
   repository. This option is used if yum needs a public key to verify
   a package and the required key hasn't been imported into the RPM
-  database. If this option is set, yum will automatically import the
-  key from the specified URL.
+  database. If `assumeyes` is true and `gpgkey` is set, yum will
+  automatically import the key from the specified URL.
 * `http_caching` - Either 'all', 'packages', or 'none'. Determines how
   upstream HTTP caches are instructed to handle any HTTP downloads
   that Yum does. Defaults to 'all'
@@ -123,41 +179,26 @@ available to the next resource.
   out. Defaults to 30 seconds. This may be too short of a time for
   extremely overloaded sites.
 
-#### Example
-``` ruby
-# add the Zenoss repository
-yum_repository 'zenoss' do
-  description "Zenoss Stable repo"
-  baseurl "http://dev.zenoss.com/yum/stable/"
-  gpgkey 'http://dev.zenoss.com/yum/RPM-GPG-KEY-zenoss'
-  action :create
-end
-
-# add the EPEL repo
-yum_repository 'epel' do
-  description 'Extra Packages for Enterprise Linux'
-  mirrorlist 'http://mirrors.fedoraproject.org/mirrorlist?repo=epel-6&arch=$basearch'
-  gpgkey 'http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6'
-  action :create
-end
-```
-
-``` ruby
-# delete CentOS-Media repo
-yum_repository 'CentOS-Media' do
-  action :delete
-end
-```
-
-### yum_globalconfig
+### rackspace_yum_globalconfig
 This renders a template with global yum configuration parameters. The
 default recipe uses it to render `/etc/yum.conf`. It is flexible
 enough to be used in other scenarios, such as building RPMs in
 isolation by modifying `installroot`. 
 
+#### Example
+``` ruby
+rackspace_yum_globalconfig '/my/chroot/etc/yum.conf' do
+  cachedir '/my/chroot/etc/yum.conf'
+  keepcache 'yes'
+  debuglevel '2'
+  installroot '/my/chroot'
+  action :create
+end
+```
+
 #### Parameters
-`yum_globalconfig` can take most of the same parameters as a
-`yum_repository`, plus more, too numerous to describe here. Below are
+`rackspace_yum_globalconfig` can take most of the same parameters as a
+`rackspace_yum_repository`, plus more, too numerous to describe here. Below are
 a few of the more commonly used ones. For a complete list, please
 consult the `yum.conf` man page, found here:
 http://linux.die.net/man/5/yum.conf
@@ -187,20 +228,9 @@ http://linux.die.net/man/5/yum.conf
   it should perform a GPG signature check on the packages gotten from
   this repository.
  
-#### Example
-``` ruby
-yum_globalconfig '/my/chroot/etc/yum.conf' do
-  cachedir '/my/chroot/etc/yum.conf'
-  keepcache 'yes'
-  debuglevel '2'
-  installroot '/my/chroot'
-  action :create
-end
-```
-
 Recipes
 -------
-* `default` - Configures `yum_globalconfig[/etc/yum.conf]` with values
+* `default` - Configures `rackspace_yum_globalconfig[/etc/yum.conf]` with values
   found in node attributes at `node['yum']['main']`
 
 Attributes
@@ -240,7 +270,7 @@ the following cookbook.
 Usage
 -----
 Put `depends 'yum'` in your metadata.rb to gain access to the
-yum_repository resource.
+rackspace_yum_repository resource.
 
 License & Authors
 -----------------
@@ -248,10 +278,12 @@ License & Authors
 - Author:: Matt Ray (<matt@getchef.com>)
 - Author:: Joshua Timberman (<joshua@getchef.com>)
 - Author:: Sean OMeara (<someara@getchef.com>)
+- Author:: Matthew Thode (<matt.thode@rackspace.com>)
 
 ```text
 Copyright:: 2011 Eric G. Wolfe
 Copyright:: 2013 Chef
+Copyright:: 2014 Rackspace
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

@@ -1,9 +1,12 @@
 #
-# Cookbook Name:: yum
+# Cookbook Name:: rackspace_yum
 # Provider:: repository
 #
 # Author:: Sean OMeara <someara@getchef.com>
+# Author:: Matthew Thode <matt.thode@rackspace.com>
+#
 # Copyright 2013, Chef
+# Copyright 2014, Rackspace, US Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,7 +41,7 @@ action :create  do
 
   template "/etc/yum.repos.d/#{new_resource.repositoryid}.repo" do
     source 'repo.erb'
-    cookbook 'yum'
+    cookbook node['rackspace_yum']['main']['cookbook_template_repository']
     mode '0644'
     variables(:config => new_resource)
     notifies :run, "execute[yum-makecache-#{new_resource.repositoryid}]", :immediately

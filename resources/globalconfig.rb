@@ -1,9 +1,11 @@
 #
-# Cookbook Name:: yum
-# Resource:: repository
+# Cookbook Name:: rackspace_yum
+# Resource:: globalconfig
 #
 # Author:: Sean OMeara <someara@getchef.com>
+# Author:: Matthew Thode <matt.thode@rackspace.com>
 # Copyright 2013, Chef
+# Copyright 2014, Rackspace, US Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -67,7 +69,7 @@ attribute :localpkg_gpgcheck, :kind_of => [TrueClass, FalseClass], :default => n
 attribute :logfile, :kind_of => String, :regex => /.*/, :default => '/var/log/yum.log'
 attribute :max_retries, :kind_of => String, :regex => /^\d+$/, :default => nil
 attribute :mdpolicy, :kind_of => String, :equal_to => %w{ instant group:primary group:small group:main group:all }, :default => nil
-attribute :metadata_expire, :kind_of => String, :regex => /^\d+$/, :default => nil
+attribute :metadata_expire, :kind_of => String, :regex => [/^\d+$/, /^\d+[mhd]$/, /never/], :default => nil
 attribute :mirrorlist_expire, :kind_of => String, :regex => /^\d+$/, :default => nil
 attribute :multilib_policy, :kind_of => String, :equal_to => %w{ all best }, :default => nil
 attribute :obsoletes, :kind_of => [TrueClass, FalseClass], :default => '1'

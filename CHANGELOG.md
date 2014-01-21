@@ -2,6 +2,21 @@ yum Cookbook CHANGELOG
 ======================
 This file is used to list changes made in each version of the yum cookbook.
 
+v4.0.0
+------
+Rackspace Fork
+due to rename/namespace issues, yum_* is renamed to rackspace_yum_*
+
+v3.0.4 (2013-12-29)
+-------------------
+### Bug
+- **[COOK-4156](https://tickets.opscode.com/browse/COOK-4156)** - yum cookbook creates a yum.conf with "cachefir" directive
+
+
+v3.0.2
+------
+Updating globalconfig provider for Chef 10 compatability
+
 
 v3.0.0
 ------

@@ -9,6 +9,8 @@ Gemfile.lock
 *.un~
 .bundle
 .cache
+.coverage
 .kitchen
 bin
 .kitchen.local.yml
+.kitchen/

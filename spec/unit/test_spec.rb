@@ -1,10 +1,13 @@
 require 'spec_helper'
 
-describe 'yum_test::test' do
+describe 'rackspace_yum_test::test' do
   let(:chef_run) do
     ChefSpec::Runner.new(
-      :step_into => %w{ yum_repository yum_globalconfig }
-      ).converge(described_recipe)
+      :step_into => %w{ rackspace_yum_repository rackspace_yum_globalconfig }
+    ) do |node|
+      node.set['rackspace_yum']['main']['cookbook_template_globalconfig'] = 'rackspace_yum'
+      node.set['rackspace_yum']['main']['cookbook_template_repository'] = 'rackspace_yum'
+    end.converge(described_recipe)
   end
 
   let(:test1_content) do
@@ -88,7 +91,7 @@ sslverify=1
 # Do NOT modify this file by hand.
 
 [main]
-cachefir=/var/cache/yum/$basearch/$releasever
+cachedir=/var/cache/yum/$basearch/$releasever
 debuglevel=2
 exactarch=1
 gpgcheck=1
@@ -108,7 +111,7 @@ alwaysprompt=true
 assumeyes=true
 bandwidth=40
 bugtracker_url=http://somewhere.eltz.biz
-cachefir=/path/to/somewhere/good
+cachedir=/path/to/somewhere/good
 clean_requirements_on_remove=true
 color=always
 color_list_available_downgrade=fg:green
@@ -181,74 +184,74 @@ tsflags=noscripts
 username=baub'
   end
 
-  context 'creating a yum_repository with minimal parameters' do
-    it 'creates yum_repository[test1]' do
-      expect(chef_run).to create_yum_repository('test1')
+  context 'creating a rackspace_yum_repository with minimal parameters' do
+    it 'creates rackspace_yum_repository[test1]' do
+      expect(chef_run).to create_rackspace_yum_repository('test1')
     end
 
-    it 'steps into yum_repository and creates template[/etc/yum.repos.d/test1.repo]' do
+    it 'steps into rackspace_yum_repository and creates template[/etc/yum.repos.d/test1.repo]' do
       expect(chef_run).to render_file('/etc/yum.repos.d/test1.repo').with_content(test1_content)
     end
   end
 
-  context 'creating a yum_repository with full parameters' do
-    it 'creates yum_repository[test2]' do
-      expect(chef_run).to create_yum_repository('test2')
+  context 'creating a rackspace_yum_repository with full parameters' do
+    it 'creates rackspace_yum_repository[test2]' do
+      expect(chef_run).to create_rackspace_yum_repository('test2')
     end
 
-    it 'steps into yum_repository and creates template[/etc/yum.repos.d/unit-test-2.repo]' do
+    it 'steps into rackspace_yum_repository and creates template[/etc/yum.repos.d/unit-test-2.repo]' do
       expect(chef_run).to render_file('/etc/yum.repos.d/unit-test-2.repo').with_content(test2_content)
     end
   end
 
-  context 'creating a yum_repository with the :remove action alias' do
-    it 'adds yum_repository[test3]' do
-      expect(chef_run).to add_yum_repository('test3')
+  context 'creating a rackspace_yum_repository with the :remove action alias' do
+    it 'adds rackspace_yum_repository[test3]' do
+      expect(chef_run).to add_rackspace_yum_repository('test3')
     end
   end
 
-  context 'creating a yum_repository with the :add action alias' do
-    it 'adds yum_repository[test4]' do
-      expect(chef_run).to remove_yum_repository('test4')
+  context 'creating a rackspace_yum_repository with the :add action alias' do
+    it 'adds rackspace_yum_repository[test4]' do
+      expect(chef_run).to remove_rackspace_yum_repository('test4')
     end
   end
 
-  context 'creating a yum_repository with the :url parameter alias' do
-    it 'creates yum_repository[test5]' do
-      expect(chef_run).to create_yum_repository('test5')
+  context 'creating a rackspace_yum_repository with the :url parameter alias' do
+    it 'creates rackspace_yum_repository[test5]' do
+      expect(chef_run).to create_rackspace_yum_repository('test5')
     end
 
-    it 'steps into yum_repository and creates template[/etc/yum.repos.d/test5.repo]' do
+    it 'steps into rackspace_yum_repository and creates template[/etc/yum.repos.d/test5.repo]' do
       expect(chef_run).to render_file('/etc/yum.repos.d/test5.repo').with_content(test5_content)
     end
   end
 
-  context 'creating a yum_repository with the :keyurl parameter alias' do
-    it 'creates yum_repository[test6]' do
-      expect(chef_run).to create_yum_repository('test6')
+  context 'creating a rackspace_yum_repository with the :keyurl parameter alias' do
+    it 'creates rackspace_yum_repository[test6]' do
+      expect(chef_run).to create_rackspace_yum_repository('test6')
     end
 
-    it 'steps into yum_repository and creates template[/etc/yum.repos.d/test6.repo]' do
+    it 'steps into rackspace_yum_repository and creates template[/etc/yum.repos.d/test6.repo]' do
       expect(chef_run).to render_file('/etc/yum.repos.d/test6.repo').with_content(test6_content)
     end
   end
 
-  context 'creating a yum_globalconfig with minimal parameters' do
-    it 'creates yum_globalconfig[/etc/yum.conf]' do
-      expect(chef_run).to create_yum_globalconfig('/tmp/yum.conf')
+  context 'creating a rackspace_yum_globalconfig with minimal parameters' do
+    it 'creates rackspace_yum_globalconfig[/etc/yum.conf]' do
+      expect(chef_run).to create_rackspace_yum_globalconfig('/tmp/yum.conf')
     end
 
-    it 'steps into yum_globalconfig and creates template[/etc/yum.conf]' do
+    it 'steps into create_rackspace_yum_globalconfig and creates template[/etc/yum.conf]' do
       expect(chef_run).to render_file('/tmp/yum.conf').with_content(test7_content)
     end
   end
 
-  context 'creating a yum_globalconfig with full parameters' do
-    it 'creates yum_globalconfig[/tmp/yum-full.conf]' do
-      expect(chef_run).to create_yum_globalconfig('/tmp/yum-full.conf')
+  context 'creating a rackspace_yum_globalconfig with full parameters' do
+    it 'creates rackspace_yum_globalconfig[/tmp/yum-full.conf]' do
+      expect(chef_run).to create_rackspace_yum_globalconfig('/tmp/yum-full.conf')
     end
 
-    it 'steps into yum_globalconfig and creates template[/tmp/yum-full.conf]' do
+    it 'steps into rackspace_yum_globalconfig and creates template[/tmp/yum-full.conf]' do
       expect(chef_run).to render_file('/tmp/yum-full.conf').with_content(test8_content)
     end
   end

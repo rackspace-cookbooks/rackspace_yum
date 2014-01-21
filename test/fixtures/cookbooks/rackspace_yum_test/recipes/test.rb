@@ -1,8 +1,9 @@
 #
-# Cookbook:: yum
+# Cookbook:: rackspace_yum
 # Recipe:: resource-tester
 #
 # Author:: Sean OMeara <someara@getchef.com>
+# Author:: Matthew Thode <matt.thode@rackspace.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +21,7 @@
 # This file is to be used for unit testing with chefspec only.
 
 # The simplest case
-yum_repository 'test1' do
+rackspace_yum_repository 'test1' do
   description 'an test'
   baseurl 'http://drop.the.baseurl.biz'
   action :create
@@ -28,7 +29,7 @@ end
 
 # Full blown parameterization. Exercercises the
 # recipe->resource->provider->template chain
-yum_repository 'test2' do
+rackspace_yum_repository 'test2' do
   description 'test all the things!'
   baseurl 'http://example.com/wat'
   cost  '10'
@@ -63,28 +64,28 @@ yum_repository 'test2' do
 end
 
 # create alias 'add'
-yum_repository 'test3' do
+rackspace_yum_repository 'test3' do
   description 'an test'
   baseurl 'http://drop.the.baseurl.biz'
   action :add
 end
 
 # delete alias 'remove'
-yum_repository 'test4' do
+rackspace_yum_repository 'test4' do
   description 'an test'
   baseurl 'http://drop.the.baseurl.biz'
   action :remove
 end
 
 # baseurl alias 'url'
-yum_repository 'test5' do
+rackspace_yum_repository 'test5' do
   description 'an test'
   url 'http://drop.the.baseurl.biz'
   action :create
 end
 
 # gpgkey alias 'keyurl'
-yum_repository 'test6' do
+rackspace_yum_repository 'test6' do
   description 'an test'
   url 'http://drop.the.baseurl.biz'
   keyurl 'http://example.com/RPM-GPG-KEY-FOOBAR-1'
@@ -94,13 +95,13 @@ end
 ########
 
 # default configuration
-yum_globalconfig '/tmp/yum.conf' do
+rackspace_yum_globalconfig '/tmp/yum.conf' do
   action :create
 end
 
 # Full blown parameterization. Exercercises the
 # recipe->resource->provider->template chain
-yum_globalconfig '/tmp/yum-full.conf' do
+rackspace_yum_globalconfig '/tmp/yum-full.conf' do
   alwaysprompt true
   assumeyes true
   bandwidth '40'
